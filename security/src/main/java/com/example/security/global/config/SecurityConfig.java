@@ -1,8 +1,8 @@
 package com.example.security.global.config;
 
-import com.example.security.global.jwt.JwtUtil;
-import com.example.security.global.jwt.JwtFilter;
-import com.example.security.global.jwt.LoginFilter;
+import com.example.security.global.security.filter.JwtUtil;
+import com.example.security.global.security.filter.JwtFilter;
+import com.example.security.global.security.filter.LoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +34,7 @@ public class SecurityConfig {
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // csrf를 disable 설정 : 세션을 stateless 상태로 관리하기 때문에 csrf 공격을 관리하지 않아도 됨
+        // csrf를 disable 설정 : stateless 상태로 관리하기 때문에 csrf 공격을 관리하지 않아도 됨
         http.csrf((auth) -> auth.disable());
         // form 로그인 방식 disable
         http.formLogin((auth)-> auth.disable());
@@ -42,7 +42,7 @@ public class SecurityConfig {
         http.httpBasic((auth)-> auth.disable());
         // 경로별 인가작업
         http.authorizeHttpRequests((auth)-> auth
-                .requestMatchers("/login", "/","/join").permitAll()
+                .requestMatchers("/login", "/","/register").permitAll()
                 .requestMatchers("/admin").hasRole("ADMIN")
                 .anyRequest().authenticated()
         );

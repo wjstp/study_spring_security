@@ -1,8 +1,6 @@
-package com.example.security.global.security.dao;
+package com.example.security.global.security.application;
 
-import com.example.security.domain.member.dto.request.RegisterReq;
-import com.example.security.domain.member.entity.Privilege;
-import com.example.security.domain.member.repository.MemberRepository;
+import com.example.security.domain.member.dao.MemberRepository;
 import com.example.security.global.security.dto.CustomUserDetails;
 import com.example.security.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;

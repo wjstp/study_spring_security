@@ -1,4 +1,4 @@
-package com.example.security.domain.member.repository;
+package com.example.security.domain.member.dao;
 
 import com.example.security.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;

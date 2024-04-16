@@ -1,12 +1,15 @@
-package com.example.security.global.jwt;
+package com.example.security.global.security.filter;
 
 import com.example.security.domain.member.entity.Privilege;
 import com.example.security.global.security.dto.CustomUserDetails;
 import com.example.security.domain.member.entity.Member;
+import io.jsonwebtoken.Claims;
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,7 +24,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @Nonnull FilterChain filterChain) throws ServletException, IOException {
         // request에서 Authorization헤더를 찾음
         String authorization = request.getHeader("Authorization");
 
@@ -38,17 +41,9 @@ public class JwtFilter extends OncePerRequestFilter {
         // Bearer 제거 후 순수 토큰 획득
         String token = authorization.split(" ")[1];
 
-        // 토큰 소멸 시간 검증
-        if (jwtUtil.isExpired(token)) {
-            System.out.println("토큰이 만료되었습니다.");
-            // 다음 필터로 넘긴다.
-            filterChain.doFilter(request, response);
-            return;
-        }
-        // 토큰에서 username과 role 획득
-        String username = jwtUtil.getUsername(token);
-        String role = jwtUtil.getRole(token);
-
+        Claims claims = jwtUtil.verifyJwtToken(token);
+        String username = claims.getSubject();
+        String role = claims.get("roles").toString();   // 수정
         // member를 생성하여 값 set
         // token에 password 정보가 없고, db에서 조회하는 방식은 비효율적이라 임의값 넣어준다.
         Member member = Member.builder()

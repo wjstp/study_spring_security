@@ -1,6 +1,6 @@
 package com.example.security.domain.member.dto.request;
 
-public record JoinReq(
+public record RegisterReq(
         String username,
         String password
 ) {

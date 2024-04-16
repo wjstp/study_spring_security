@@ -1,5 +1,6 @@
 package com.example.security.global.jwt;
 
+import com.example.security.domain.member.entity.Privilege;
 import com.example.security.global.security.dto.CustomUserDetails;
 import com.example.security.domain.member.entity.Member;
 import jakarta.servlet.FilterChain;
@@ -53,7 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
         Member member = Member.builder()
                 .username(username)
                 .password("tmppassword")
-                .role(role)
+                .role(Privilege.valueOf(role))
                 .build();
 
         // userDetails에 회원 정보 담기

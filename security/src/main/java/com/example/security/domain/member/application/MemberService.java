@@ -1,7 +1,7 @@
 package com.example.security.domain.member.application;
 
-import com.example.security.domain.member.dto.request.JoinReq;
+import com.example.security.domain.member.dto.request.RegisterReq;
 
 public interface MemberService {
-    void join(JoinReq joinReq);
+    void register(RegisterReq registerReq);
 }

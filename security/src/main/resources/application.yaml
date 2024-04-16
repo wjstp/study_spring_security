@@ -1,0 +1,57 @@
+spring:
+  profiles:
+    active:
+      - local
+      - common
+    group:
+      local:
+        - db-local
+        - security-local
+      prod:
+        - db-prod
+        - security-prod
+    include:
+      - db
+      - security
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:mysql://localhost:3306/security?serverTimezone=UTC&useUniCode=yes&characterEncoding=UTF-8
+    username: root
+    password: ssafy123!
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+    generate-ddl: true
+    open-in-view: false
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  jwt:
+    secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
+
+logging:
+  level:
+    com: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
+    org.springframework.security: debug
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    com: info

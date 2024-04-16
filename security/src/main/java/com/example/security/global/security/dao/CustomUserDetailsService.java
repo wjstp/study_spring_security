@@ -1,5 +1,7 @@
 package com.example.security.global.security.dao;
 
+import com.example.security.domain.member.dto.request.RegisterReq;
+import com.example.security.domain.member.entity.Privilege;
 import com.example.security.domain.member.repository.MemberRepository;
 import com.example.security.global.security.dto.CustomUserDetails;
 import com.example.security.domain.member.entity.Member;
@@ -17,12 +19,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
-    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member memberData = memberRepository.findByUsername(username);
+        Member member = memberRepository.findByUsername(username);
         // db에서 가져온값 검증 진행
-        if (Objects.nonNull(memberData)) {
-            return new CustomUserDetails(memberData);
+        if (Objects.nonNull(member)) {
+            return new CustomUserDetails(member);
         }
         return null;
     }

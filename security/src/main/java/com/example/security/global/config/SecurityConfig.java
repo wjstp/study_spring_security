@@ -1,5 +1,6 @@
 package com.example.security.global.config;
 
+import com.example.security.global.security.application.JwtService;
 import com.example.security.global.security.filter.JwtFilter;
 import com.example.security.global.security.filter.JwtUtil;
 import com.example.security.global.security.handler.LoginFailureHandler;
@@ -23,6 +24,7 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -47,7 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 // jwtfilter 등록 - UsernamePasswordAuthenticationFilter 전
-                .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
 //            // login filter 등록 - UsernamePasswordAuthenticationFilter 위치에 필터 추가
 //            .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
 

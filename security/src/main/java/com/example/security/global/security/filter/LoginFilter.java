@@ -1,6 +1,6 @@
 package com.example.security.global.security.filter;
 
-import com.example.security.global.security.dto.CustomUserDetails;
+import com.example.security.global.security.dto.CustomUserDetailsDTO;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,7 +37,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     // 로그인 성공시 - jwt 발급
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        CustomUserDetailsDTO customUserDetails = (CustomUserDetailsDTO) authentication.getPrincipal();
         // username
         String username = customUserDetails.getUsername();
         // role

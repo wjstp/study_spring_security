@@ -1,7 +1,7 @@
 package com.example.security.global.security.filter;
 
 import com.example.security.domain.member.entity.Privilege;
-import com.example.security.global.security.dto.CustomUserDetails;
+import com.example.security.global.security.dto.CustomUserDetailsDTO;
 import com.example.security.domain.member.entity.Member;
 import io.jsonwebtoken.Claims;
 import jakarta.annotation.Nonnull;
@@ -53,7 +53,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 .build();
 
         // userDetails에 회원 정보 담기
-        CustomUserDetails customUserDetails = new CustomUserDetails(member);
+        CustomUserDetailsDTO customUserDetails = new CustomUserDetailsDTO(member);
 
         // 스프링 시큐리티 인증 토큰 생성
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());

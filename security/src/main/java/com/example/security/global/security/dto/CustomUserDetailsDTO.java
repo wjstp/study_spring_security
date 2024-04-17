@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetailsDTO implements UserDetails {
     private final Member member;
     
     // user role 반환

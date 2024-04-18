@@ -18,6 +18,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Member member = memberRepository.findByUsername(username);
         // db에서 가져온값 검증 진행
-        return new CustomUserDetailsDTO(member);
+        return CustomUserDetailsDTO.builder()
+                .username(member.getUsername())
+                .role(member.getRole())
+                .password(member.getPassword())
+                .build();
     }
 }

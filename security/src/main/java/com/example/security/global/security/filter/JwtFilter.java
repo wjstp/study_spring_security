@@ -27,5 +27,6 @@ public class JwtFilter extends OncePerRequestFilter {
         // 그 다음 필터로 이동
         filterChain.doFilter(request, response);
         // 예외 처리 추가
+        System.out.println("토큰 검증 완료");
     }
 }

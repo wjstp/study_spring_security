@@ -11,7 +11,7 @@ public record MemberRegisterReq(
         return Member.builder()
                 .username(this.username)
                 .password(this.password)
-                .role(Privilege.USER)
+                .role(Privilege.ADMIN)
                 .build();
     }
 }

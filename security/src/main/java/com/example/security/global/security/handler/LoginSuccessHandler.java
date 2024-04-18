@@ -21,15 +21,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomUserDetailsDTO customUserDetails = (CustomUserDetailsDTO) authentication.getPrincipal();
-        // username
-        String username = customUserDetails.getUsername();
-        // role
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
-        String role = auth.getAuthority();
         // token 생성
-        String token = jwtUtil.createJwt(username, role, 60*60*10L);
+        String token = jwtUtil.generateAccessToken(customUserDetails);
         response.addHeader("Authorization", "Bearer " + token);
     }
 }

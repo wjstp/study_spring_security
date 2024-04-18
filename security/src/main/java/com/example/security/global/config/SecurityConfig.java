@@ -22,7 +22,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
     private final JwtService jwtService;
 
@@ -33,27 +32,26 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         // csrf를 disable 설정 : stateless 상태로 관리하기 때문에 csrf 공격을 관리하지 않아도 됨
         http.csrf(AbstractHttpConfigurer::disable)
                 // 세션 설정 - stateless
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 경로별 인가작업
+                .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/login", "/", "/register").permitAll()
+                        .requestMatchers("/admin").hasRole("ADMIN")
+                        .anyRequest().authenticated())  //
                 .formLogin(
-                        configure -> configure.loginProcessingUrl("/api/login")
+                        configure -> configure.loginProcessingUrl("/login")
                                 .successHandler(new LoginSuccessHandler(jwtUtil))
                                 .failureHandler(new LoginFailureHandler())
                 )
-                .httpBasic(AbstractHttpConfigurer::disable)
-                // 경로별 인가작업
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/login", "/", "/register").permitAll()
-                        .requestMatchers("/admin").hasRole("ADMIN")
-                        .anyRequest().authenticated())
+                .httpBasic(AbstractHttpConfigurer::disable) // http basic auth 기반으로 한 로그인 인증창 사용하지않으므로 disable
                 // jwtfilter 등록 - UsernamePasswordAuthenticationFilter 전
                 .addFilterBefore(new JwtFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
 //            // login filter 등록 - UsernamePasswordAuthenticationFilter 위치에 필터 추가
 //            .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
-
-
         return http.build();
     }
 }

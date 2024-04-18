@@ -1,38 +1,52 @@
 package com.example.security.global.security.dto;
 
 import com.example.security.domain.member.entity.Member;
+import com.example.security.domain.member.entity.Privilege;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-@RequiredArgsConstructor
+@Builder
 public class CustomUserDetailsDTO implements UserDetails {
-    private final Member member;
-    
+
+    private String username;
+
+
+    private String password;
+
+
+    private Privilege role;
+
+
+    private Collection<? extends GrantedAuthority> authorities;
+
+
+    private boolean isAccountNonLocked;
+
+    private boolean isCredentialsNonExpired;
+
+    private boolean isEnabled;
+
+
     // user role 반환
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> collection = new ArrayList<>();
-        collection.add(new GrantedAuthority() {
-            @Override
-            public String getAuthority() {
-                return member.getRole().toString();
-            }
-        });
-        return collection;
+        return AuthorityUtils.createAuthorityList(this.role.toString());
     }
 
     @Override
     public String getPassword() {
-        return member.getPassword();
+        return this.password;
     }
 
     @Override
     public String getUsername() {
-        return member.getUsername();
+        return this.username;
     }
 
     @Override

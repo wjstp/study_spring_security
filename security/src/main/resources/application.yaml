@@ -38,7 +38,13 @@ spring:
       matching-strategy: ant_path_matcher
   jwt:
     secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
-
+    expiration: 60000
+    refresh-token:
+      expiration: 6040000000
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
 logging:
   level:
     com: debug

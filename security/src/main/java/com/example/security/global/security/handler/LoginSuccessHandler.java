@@ -33,7 +33,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         // refresh token 저장
         jwtService.saveToken(accessToken, refreshToken);
-        Cookie cookie = createCookie(refreshToken);
+        Cookie cookie = jwtService.createCookie(refreshToken);
         response.addCookie(cookie);
 
         //로그인 성공 메세지
@@ -43,14 +43,5 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
 
-    public Cookie createCookie(String refreshToken) {
-        String cookieName = "Refresh-Token";
-        Cookie cookie = new Cookie(cookieName, refreshToken);
-        // 쿠키 속성 설정
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/auth/refresh");
-        cookie.setMaxAge(15&50*60*24);
-        return cookie;
-    }
+
 }

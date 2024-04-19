@@ -40,11 +40,12 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 경로별 인가작업
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "/", "/register", "/refresh-token", "/auth/refresh").permitAll()
+                        .requestMatchers( "/auth/refresh", "/api/login",  "/", "/register").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(
                         configure -> configure
+                                .loginProcessingUrl("/api/login")
                                 .successHandler(new LoginSuccessHandler(jwtUtil, jwtService))
                                 .failureHandler(new LoginFailureHandler())
                 )
@@ -52,6 +53,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 // jwtfilter 등록 - UsernamePasswordAuthenticationFilter 전
                 .addFilterBefore(new JwtFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }

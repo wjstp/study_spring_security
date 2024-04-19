@@ -2,13 +2,14 @@ package com.example.security.global.security.application;
 
 import com.example.security.domain.member.entity.Privilege;
 import com.example.security.global.security.dao.RefreshTokenRepository;
-import com.example.security.global.security.dto.AuthToken;
 import com.example.security.global.security.dto.CustomUserDetailsDTO;
 import com.example.security.global.security.dto.RefreshToken;
 import com.example.security.global.security.dto.TokenDTO;
 import com.example.security.global.security.filter.JwtUtil;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -61,20 +62,24 @@ public class JwtService {
     }
 
     // token 갱신
-    public TokenDTO refreshAccessToken(AuthToken authToken) {
-        Claims claims = verifyJwtToken(authToken.refreshToken()); // 예외처리 할 것
-
+    public TokenDTO refreshAccessToken(String refreshToken, String accessToken) {
+        Claims claims = verifyJwtToken(refreshToken); // 예외처리 할 것
+        // 기존 redis 삭제 로직 추가
+        RefreshToken redisRefreshToken = refreshTokenRepository.findByAccessToken(accessToken).orElseThrow(()-> new JwtException("일치하는 refreshtoken이 없다잉"));
+        refreshTokenRepository.delete(redisRefreshToken);
         CustomUserDetailsDTO userDetailsDTO = CustomUserDetailsDTO.builder()
                 .username(claims.get("username").toString())
                 .role(Privilege.valueOf((String) claims.get("role")))
                 .build();
+        // access token이 일치하지 않으면 refresh token으로 요청보낼 것
+        // 1. refresh token이 일치하는 경우 accesstoken을 재발급해서 제공
+        // 2. refresh token이 일치하지 않는 경우 refresh token과 aceess token모두 재발급
         // access token 발급
-        String accessToken = jwtUtil.generateAccessToken(userDetailsDTO);
+        String newAccessToken = jwtUtil.generateAccessToken(userDetailsDTO);
         // refresh token 갱신
-        String newRefreshToken = jwtUtil.generateRefreshToken(accessToken, userDetailsDTO);
-
-        saveToken(accessToken, newRefreshToken);
-        return new TokenDTO(accessToken, newRefreshToken);
+        String newRefreshToken = jwtUtil.generateRefreshToken(newAccessToken, userDetailsDTO);
+        saveToken(newAccessToken, newRefreshToken);
+        return new TokenDTO(newAccessToken, newRefreshToken);
     }
 
 
@@ -93,5 +98,17 @@ public class JwtService {
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
                         .build());
+    }
+
+    public Cookie createCookie(String refreshToken) {
+        System.out.println("refreshtoken 확인 " + refreshToken);
+        String cookieName = "Refresh-Token";
+        Cookie cookie = new Cookie(cookieName, refreshToken);
+        // 쿠키 속성 설정
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/auth/refresh");
+        cookie.setMaxAge(15 & 50 * 60 * 24);
+        return cookie;
     }
 }

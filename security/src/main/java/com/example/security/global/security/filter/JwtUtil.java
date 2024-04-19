@@ -10,13 +10,16 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
 @Component
 public class JwtUtil {
-    private final SecretKey secretKey;
+
+    private SecretKey secretKey;
     private final long accessTokenExpiration;
     private final long refreshTokenExpiration;
 
@@ -24,13 +27,13 @@ public class JwtUtil {
 
     public JwtUtil (
             @Value("${spring.jwt.secret}")
-            SecretKey secretKey,
-            @Value("${spring.jwt.secret.expiration")
+            String secret,
+            @Value("${spring.jwt.expiration}")
             long accessTokenExpiration,
-            @Value("${spring.jwt.refresh-token.expiration")
+            @Value("${spring.jwt.refresh-token.expiration}")
             long refreshTokenExpiration
     ) {
-        this.secretKey = secretKey;
+        secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
         this.accessTokenExpiration = accessTokenExpiration;
         this.refreshTokenExpiration = refreshTokenExpiration;
     }
@@ -66,11 +69,7 @@ public class JwtUtil {
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
-        String refreshToken = createToken(username, role, refreshTokenExpiration);
-        // redis에 저장
-        // 기존에 이미
-        saveToken(refreshToken, accessToken);
-        return refreshToken;
+        return createToken(username, role, refreshTokenExpiration);
     }
     // 토큰 생성
     public String createToken(String username, String role, long expiration) {
@@ -82,13 +81,5 @@ public class JwtUtil {
                 .signWith(secretKey)
                 .compact();
     }
-    // token 저장
-    public void saveToken(String accessToken, String refreshToken) {
-        refreshTokenRepository.save(
-                RefreshToken.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
-                        .build()
-        );
-    }
+
 }

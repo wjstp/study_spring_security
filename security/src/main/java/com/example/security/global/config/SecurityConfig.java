@@ -6,6 +6,7 @@ import com.example.security.global.security.filter.JwtUtil;
 import com.example.security.global.security.handler.LoginFailureHandler;
 import com.example.security.global.security.handler.LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity // security를 위한 config
 @RequiredArgsConstructor
+@Log4j2
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
@@ -32,26 +34,24 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         // csrf를 disable 설정 : stateless 상태로 관리하기 때문에 csrf 공격을 관리하지 않아도 됨
         http.csrf(AbstractHttpConfigurer::disable)
                 // 세션 설정 - stateless
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 경로별 인가작업
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "/", "/register").permitAll()
+                        .requestMatchers("/login", "/", "/register", "/refresh-token", "/auth/refresh").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
-                        .anyRequest().authenticated())  //
+                        .anyRequest().authenticated())
                 .formLogin(
-                        configure -> configure.loginProcessingUrl("/login")
-                                .successHandler(new LoginSuccessHandler(jwtUtil))
+                        configure -> configure
+                                .successHandler(new LoginSuccessHandler(jwtUtil, jwtService))
                                 .failureHandler(new LoginFailureHandler())
                 )
-                .httpBasic(AbstractHttpConfigurer::disable) // http basic auth 기반으로 한 로그인 인증창 사용하지않으므로 disable
+                // http basic auth 기반으로 한 로그인 인증창 사용하지않으므로 disable
+                .httpBasic(AbstractHttpConfigurer::disable)
                 // jwtfilter 등록 - UsernamePasswordAuthenticationFilter 전
                 .addFilterBefore(new JwtFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
-//            // login filter 등록 - UsernamePasswordAuthenticationFilter 위치에 필터 추가
-//            .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
         return http.build();
     }
 }

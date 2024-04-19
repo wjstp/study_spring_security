@@ -1,9 +1,10 @@
 package com.example.security.global.security.application;
 
-import com.example.security.domain.member.entity.Member;
 import com.example.security.domain.member.entity.Privilege;
+import com.example.security.global.security.dao.RefreshTokenRepository;
 import com.example.security.global.security.dto.AuthToken;
 import com.example.security.global.security.dto.CustomUserDetailsDTO;
+import com.example.security.global.security.dto.RefreshToken;
 import com.example.security.global.security.dto.TokenDTO;
 import com.example.security.global.security.filter.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -22,6 +23,7 @@ public class JwtService {
     private final JwtUtil jwtUtil;
     private static final String ACCESS_HEADER_AUTHORIZATION = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public Authentication authenticateJwtToken(HttpServletRequest request) {
         String token = parseJwt(request);
@@ -32,7 +34,6 @@ public class JwtService {
         String username = claims.get("username").toString();
         String role = claims.get("role").toString();   // 수정
         // member를 생성하여 값 set
-
         CustomUserDetailsDTO customUserDetails = CustomUserDetailsDTO.builder()
                 .username(username)
                 .role(Privilege.valueOf(role))
@@ -47,11 +48,11 @@ public class JwtService {
         String authorization = request.getHeader(ACCESS_HEADER_AUTHORIZATION);
 
         // Authorization 헤더 검증
-        if (Objects.isNull(authorization)){
+        if (Objects.isNull(authorization)) {
             System.out.println("토큰이 존재하지 않습니다.");
             return null;
         }
-        if(!authorization.startsWith(TOKEN_PREFIX)) {
+        if (!authorization.startsWith(TOKEN_PREFIX)) {
             System.out.println("접두사가 일치하지 않습니다.");
             return null;
         }
@@ -63,7 +64,6 @@ public class JwtService {
     public TokenDTO refreshAccessToken(AuthToken authToken) {
         Claims claims = verifyJwtToken(authToken.refreshToken()); // 예외처리 할 것
 
-
         CustomUserDetailsDTO userDetailsDTO = CustomUserDetailsDTO.builder()
                 .username(claims.get("username").toString())
                 .role(Privilege.valueOf((String) claims.get("role")))
@@ -73,6 +73,7 @@ public class JwtService {
         // refresh token 갱신
         String newRefreshToken = jwtUtil.generateRefreshToken(accessToken, userDetailsDTO);
 
+        saveToken(accessToken, newRefreshToken);
         return new TokenDTO(accessToken, newRefreshToken);
     }
 
@@ -81,8 +82,16 @@ public class JwtService {
         System.out.println("토큰 검증 시작");
         try {
             return jwtUtil.verifyJwtToken(token);
-        } catch(MalformedJwtException malformedJwtException) {
+        } catch (MalformedJwtException malformedJwtException) {
             throw new RuntimeException("Malformed Token");
         }
+    }
+
+    public void saveToken(String accessToken, String refreshToken) {
+        refreshTokenRepository.save(
+                RefreshToken.builder()
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .build());
     }
 }

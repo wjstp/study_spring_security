@@ -21,7 +21,8 @@ public class CustomOAuth2Service extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
-        System.out.println(request.getClientRegistration());
+        System.out.println("##############");
+        System.out.println(request.getAdditionalParameters());
         System.out.println("여기까진?");
         OAuth2User oAuth2User = super.loadUser(request);
         System.out.println("ghdldldldldldl");

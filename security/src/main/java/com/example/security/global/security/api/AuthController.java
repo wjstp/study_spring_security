@@ -22,6 +22,11 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AuthController {
     private final JwtService jwtService;
+    public void socialLogin() {
+
+    }
+
+
     // 액세스 토큰 재발급
     @PostMapping( "/auth/refresh")
     public void rotateRefreshToken(HttpServletRequest request, HttpServletResponse response,

@@ -1,6 +1,7 @@
 package com.example.security.global.security.application;
 
 import com.example.security.domain.member.dao.MemberRepository;
+import com.example.security.domain.member.dao.SocialMemberRepository;
 import com.example.security.domain.member.entity.Member;
 import com.example.security.domain.member.entity.Privilege;
 import com.example.security.global.security.dto.OAuth2LoginDTO;
@@ -20,6 +21,7 @@ import java.util.Map;
 public class CustomOAuth2Service extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
+    private final SocialMemberRepository socialMemberRepository;
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
         System.out.println("##############");
         System.out.println(request.getAdditionalParameters());
@@ -40,10 +42,12 @@ public class CustomOAuth2Service extends DefaultOAuth2UserService {
         };
         // db에서 조회, 없다면 가입
         Member member = memberRepository.findByUsername(email).orElseGet(()-> registerMember(oAuth2User));
-        return OAuth2LoginDTO.builder()
+        var result = OAuth2LoginDTO.builder()
                 .username(member.getUsername())
                 .role(Privilege.USER)
                 .build();
+        System.out.println(result);
+        return result;
     }
 
     public Member registerMember(OAuth2User oAuth2User) {
@@ -53,6 +57,7 @@ public class CustomOAuth2Service extends DefaultOAuth2UserService {
                 Member.builder()
                         .username(response.get("email").toString())
                         .role(Privilege.USER)
+                        .password("tetet")
                         .build());
     }
 

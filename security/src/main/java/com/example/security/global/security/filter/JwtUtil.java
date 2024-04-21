@@ -6,15 +6,21 @@ import com.example.security.global.security.dto.RefreshToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -22,6 +28,7 @@ public class JwtUtil {
     private SecretKey secretKey;
     private final long accessTokenExpiration;
     private final long refreshTokenExpiration;
+    private final String AUTHORITIES_KEY = "authorities";
 
     private RefreshTokenRepository refreshTokenRepository;
 
@@ -49,37 +56,53 @@ public class JwtUtil {
 
 
     // access token  생성
-    public String generateAccessToken(CustomUserDetailsDTO customUserDetailsDTO) {
-        // username
-        String username = customUserDetailsDTO.getUsername();
-        // role
-        Collection<? extends GrantedAuthority> authorities = customUserDetailsDTO.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
-        String role = auth.getAuthority();
-        return createToken(username, role, accessTokenExpiration);
+    public String generateAccessToken(Authentication authentication) {
+        return createToken(authentication, accessTokenExpiration);
     }
 
     // refresh token 생성
-    public String generateRefreshToken(String accessToken, CustomUserDetailsDTO customUserDetailsDTO) {
-        // username
-        String username = customUserDetailsDTO.getUsername();
-        // role
-        Collection<? extends GrantedAuthority> authorities = customUserDetailsDTO.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
-        String role = auth.getAuthority();
-        return createToken(username, role, refreshTokenExpiration);
+    public String generateRefreshToken(Authentication authentication) {
+        return createToken(authentication, refreshTokenExpiration);
     }
     // 토큰 생성
-    public String createToken(String username, String role, long expiration) {
+    public String createToken(Authentication authentication, long expiration) {
+        String authorities = authentication.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+        long now = System.currentTimeMillis();
         return Jwts.builder()
-                .claim("username", username)
-                .claim("role", role)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .claim(AUTHORITIES_KEY, authorities)
+                .issuedAt(new Date(now))
+                .expiration(new Date(now + expiration))
                 .signWith(secretKey)
                 .compact();
     }
+
+    public Authentication getAuthentication(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        Collection<? extends GrantedAuthority> authorities = getAuthorities(claims);
+        CustomUserDetailsDTO principal = CustomUserDetailsDTO.builder()
+                .authorities(authorities)
+                .isEnabled(true)
+                .isCredentialsNonExpired(true)
+                .isAccountNonLocked(true)
+                .build();
+
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    }
+    private Collection<? extends GrantedAuthority> getAuthorities(Claims claims) {
+        Collection<? extends GrantedAuthority> authorities =
+                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toCollection(ArrayList::new));
+        return authorities;
+    }
+
+
 
 }

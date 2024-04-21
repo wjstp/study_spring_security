@@ -64,20 +64,18 @@ public class JwtService {
     // token 갱신
     public TokenDTO refreshAccessToken(String refreshToken, String accessToken) {
         Claims claims = verifyJwtToken(refreshToken); // 예외처리 할 것
-        // 기존 redis 삭제 로직 추가
+        // 기존 redis 삭제
         RefreshToken redisRefreshToken = refreshTokenRepository.findByAccessToken(accessToken).orElseThrow(()-> new JwtException("일치하는 refreshtoken이 없다잉"));
         refreshTokenRepository.delete(redisRefreshToken);
-        CustomUserDetailsDTO userDetailsDTO = CustomUserDetailsDTO.builder()
-                .username(claims.get("username").toString())
-                .role(Privilege.valueOf((String) claims.get("role")))
-                .build();
         // access token이 일치하지 않으면 refresh token으로 요청보낼 것
         // 1. refresh token이 일치하는 경우 accesstoken을 재발급해서 제공
         // 2. refresh token이 일치하지 않는 경우 refresh token과 aceess token모두 재발급
         // access token 발급
-        String newAccessToken = jwtUtil.generateAccessToken(userDetailsDTO);
+        //
+        Authentication authentication = jwtUtil.getAuthentication(refreshToken);
+        String newAccessToken = jwtUtil.generateAccessToken(authentication);
         // refresh token 갱신
-        String newRefreshToken = jwtUtil.generateRefreshToken(newAccessToken, userDetailsDTO);
+        String newRefreshToken = jwtUtil.generateRefreshToken(authentication);
         saveToken(newAccessToken, newRefreshToken);
         return new TokenDTO(newAccessToken, newRefreshToken);
     }

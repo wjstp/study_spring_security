@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 경로별 인가작업
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login","/oauth2/authorization/kakao", "/auth/refresh", "/api/login",  "/", "/register" ).permitAll()
+                        .requestMatchers("/nickname" , "/login","/oauth2/authorization/kakao", "/auth/refresh", "/api/login",  "/", "/register" ).permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(
@@ -57,7 +57,6 @@ public class SecurityConfig {
                 )
                 .oauth2Login(
                         oauth2 -> oauth2
-                                .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2Service))
                                 .successHandler(new CustomOauth2SuccessHandler(jwtUtil, jwtService))
                                 .failureHandler(new CustomOauth2FailureHandler())
                 )

@@ -2,6 +2,7 @@ package com.example.security.global.security.handler;
 
 import com.example.security.global.security.application.JwtService;
 import com.example.security.global.security.dto.CustomUserDetailsDTO;
+import com.example.security.global.security.dto.OAuth2LoginDTO;
 import com.example.security.global.security.filter.JwtUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -21,13 +22,16 @@ public class CustomOauth2SuccessHandler implements AuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         System.out.println("로그인 성공");
-        CustomUserDetailsDTO customUserDetails = (CustomUserDetailsDTO) authentication.getPrincipal();
+        System.out.println(authentication.getPrincipal());
+        System.out.println(authentication.getAuthorities());
+        System.out.println(authentication.getDetails());
+//        OAuth2LoginDTO customUserDetails = (OAuth2LoginDTO) authentication.getPrincipal();
         // access token 생성
-        String accessToken = jwtUtil.generateAccessToken(customUserDetails);
+        String accessToken = jwtUtil.generateAccessToken(authentication);
         response.addHeader("Authorization", "Bearer " + accessToken);
 
         // refresh token 발급
-        String refreshToken = jwtUtil.generateRefreshToken(accessToken, customUserDetails);
+        String refreshToken = jwtUtil.generateRefreshToken(authentication);
 
         // refresh token 저장
         jwtService.saveToken(accessToken, refreshToken);

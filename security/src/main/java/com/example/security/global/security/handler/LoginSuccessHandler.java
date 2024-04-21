@@ -24,12 +24,12 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         System.out.println("로그인 성공");
-        CustomUserDetailsDTO customUserDetails = (CustomUserDetailsDTO) authentication.getPrincipal();
+//        CustomUserDetailsDTO customUserDetails = (CustomUserDetailsDTO) authentication.getPrincipal();
         // access token 생성
-        String accessToken = jwtUtil.generateAccessToken(customUserDetails);
+        String accessToken = jwtUtil.generateAccessToken(authentication);
         response.addHeader("Authorization", "Bearer " + accessToken);
         // refresh token 발급
-        String refreshToken = jwtUtil.generateRefreshToken(accessToken, customUserDetails);
+        String refreshToken = jwtUtil.generateRefreshToken(authentication);
 
         // refresh token 저장
         jwtService.saveToken(accessToken, refreshToken);

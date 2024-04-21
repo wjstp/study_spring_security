@@ -1,7 +1,6 @@
 package com.example.security.global.security.application;
 
 import com.example.security.domain.member.dao.MemberRepository;
-import com.example.security.domain.member.dao.SocialMemberRepository;
 import com.example.security.domain.member.entity.Member;
 import com.example.security.domain.member.entity.Privilege;
 import com.example.security.global.security.dto.OAuth2LoginDTO;
@@ -21,13 +20,8 @@ import java.util.Map;
 public class CustomOAuth2Service extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
-    private final SocialMemberRepository socialMemberRepository;
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
-        System.out.println("##############");
-        System.out.println(request.getAdditionalParameters());
-        System.out.println("여기까진?");
         OAuth2User oAuth2User = super.loadUser(request);
-        System.out.println("ghdldldldldldl");
         log.info("user: " + oAuth2User.getAuthorities().toString());
 
         String clientId = request.getClientRegistration().getRegistrationId();

@@ -1,14 +1,11 @@
 package com.example.security.global.security.dto;
 
-import com.example.security.domain.member.entity.Member;
 import com.example.security.domain.member.entity.Privilege;
 import lombok.Builder;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 @Builder
@@ -16,15 +13,11 @@ public class CustomUserDetailsDTO implements UserDetails {
 
     private String username;
 
-
     private String password;
-
 
     private Privilege role;
 
-
     private Collection<? extends GrantedAuthority> authorities;
-
 
     private boolean isAccountNonLocked;
 

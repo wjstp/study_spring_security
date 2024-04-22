@@ -22,10 +22,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AuthController {
     private final JwtService jwtService;
-    public void socialLogin() {
-
-    }
-
 
     // 액세스 토큰 재발급
     @PostMapping( "/auth/refresh")
@@ -45,7 +41,6 @@ public class AuthController {
     }
 
     private Cookie getCookie(HttpServletRequest request) {
-        log.info(Objects.toString(request) + "쿠키");
         return Arrays.stream(request.getCookies())
                 .filter(cookie -> cookie.getName().equals("Refresh-Token"))
                 .findFirst()

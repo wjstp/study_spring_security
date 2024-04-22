@@ -17,6 +17,7 @@ public class OAuth2LoginDTO implements OAuth2User {
 
     private String username;
     private Privilege role;
+
     @Override
     public Map<String, Object> getAttributes() {
         return Map.of("email", this.username);

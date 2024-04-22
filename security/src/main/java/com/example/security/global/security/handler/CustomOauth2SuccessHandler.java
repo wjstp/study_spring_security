@@ -1,9 +1,7 @@
 package com.example.security.global.security.handler;
 
 import com.example.security.global.security.application.JwtService;
-import com.example.security.global.security.dto.CustomUserDetailsDTO;
-import com.example.security.global.security.dto.OAuth2LoginDTO;
-import com.example.security.global.security.filter.JwtUtil;
+import com.example.security.global.security.util.JwtUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +23,6 @@ public class CustomOauth2SuccessHandler implements AuthenticationSuccessHandler 
         System.out.println(authentication.getPrincipal());
         System.out.println(authentication.getAuthorities());
         System.out.println(authentication.getDetails());
-//        OAuth2LoginDTO customUserDetails = (OAuth2LoginDTO) authentication.getPrincipal();
         // access token 생성
         String accessToken = jwtUtil.generateAccessToken(authentication);
         response.addHeader("Authorization", "Bearer " + accessToken);

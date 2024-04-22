@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -17,8 +19,9 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column(unique = true) // 중복체크
+    @Column(unique = true)  // 중복체크
     private String username;
+    private Date birth;
     private String nickname;
     @Convert(converter = PasswordConverter.class)   // 암호화된 비밀번호 저장
     private String password;

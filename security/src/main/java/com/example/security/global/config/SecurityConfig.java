@@ -1,9 +1,8 @@
 package com.example.security.global.config;
 
-import com.example.security.global.security.application.CustomOAuth2Service;
 import com.example.security.global.security.application.JwtService;
 import com.example.security.global.security.filter.JwtFilter;
-import com.example.security.global.security.filter.JwtUtil;
+import com.example.security.global.security.util.JwtUtil;
 import com.example.security.global.security.handler.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -31,7 +30,6 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final JwtService jwtService;
-    private final CustomOAuth2Service customOAuth2Service;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {

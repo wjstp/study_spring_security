@@ -1,20 +1,16 @@
 package com.example.security.global.security.handler;
 
 import com.example.security.global.security.application.JwtService;
-import com.example.security.global.security.dto.CustomUserDetailsDTO;
-import com.example.security.global.security.filter.JwtUtil;
+import com.example.security.global.security.util.JwtUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
 
 @RequiredArgsConstructor
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
@@ -23,8 +19,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        System.out.println("로그인 성공");
-//        CustomUserDetailsDTO customUserDetails = (CustomUserDetailsDTO) authentication.getPrincipal();
         // access token 생성
         String accessToken = jwtUtil.generateAccessToken(authentication);
         response.addHeader("Authorization", "Bearer " + accessToken);

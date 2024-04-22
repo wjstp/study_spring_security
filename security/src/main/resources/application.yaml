@@ -42,6 +42,8 @@ spring:
     refresh-token:
       expiration: 6040000000
 
+
+
   security:
     oauth2:
       client:
@@ -71,6 +73,9 @@ logging:
     org.hibernate.type: trace
     org.springframework.security: debug
 
+# firebase
+fcm:
+  certification: firebase-certification.json
 ---
 spring:
   config:

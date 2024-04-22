@@ -5,7 +5,7 @@ import com.example.security.global.security.dao.RefreshTokenRepository;
 import com.example.security.global.security.dto.CustomUserDetailsDTO;
 import com.example.security.global.security.dto.RefreshToken;
 import com.example.security.global.security.dto.TokenDTO;
-import com.example.security.global.security.filter.JwtUtil;
+import com.example.security.global.security.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -21,10 +21,11 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class JwtService {
+
     private final JwtUtil jwtUtil;
+    private final RefreshTokenRepository refreshTokenRepository;
     private static final String ACCESS_HEADER_AUTHORIZATION = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
-    private final RefreshTokenRepository refreshTokenRepository;
 
     public Authentication authenticateJwtToken(HttpServletRequest request) {
         String token = parseJwt(request);
@@ -42,7 +43,6 @@ public class JwtService {
         // 스프링 시큐리티 인증 토큰 생성
         return new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
     }
-
 
     public String parseJwt(HttpServletRequest request) {
         // request에서 Authorization헤더를 찾음
@@ -65,7 +65,7 @@ public class JwtService {
     public TokenDTO refreshAccessToken(String refreshToken, String accessToken) {
         Claims claims = verifyJwtToken(refreshToken); // 예외처리 할 것
         // 기존 redis 삭제
-        RefreshToken redisRefreshToken = refreshTokenRepository.findByAccessToken(accessToken).orElseThrow(()-> new JwtException("일치하는 refreshtoken이 없다잉"));
+        RefreshToken redisRefreshToken = refreshTokenRepository.findByAccessToken(accessToken).orElseThrow(() -> new JwtException("일치하는 refreshtoken이 없다잉"));
         refreshTokenRepository.delete(redisRefreshToken);
         // access token이 일치하지 않으면 refresh token으로 요청보낼 것
         // 1. refresh token이 일치하는 경우 accesstoken을 재발급해서 제공
@@ -79,7 +79,6 @@ public class JwtService {
         saveToken(newAccessToken, newRefreshToken);
         return new TokenDTO(newAccessToken, newRefreshToken);
     }
-
 
     public Claims verifyJwtToken(String token) {
         System.out.println("토큰 검증 시작");

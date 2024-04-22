@@ -58,6 +58,4 @@ public class CustomOAuth2Service extends DefaultOAuth2UserService {
                         .password(String.valueOf(UUID.randomUUID()))
                         .build());
     }
-
-
 }

@@ -21,6 +21,7 @@ import java.util.Objects;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthController {
+
     private final JwtService jwtService;
 
     // 액세스 토큰 재발급

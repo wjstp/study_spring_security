@@ -14,7 +14,9 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 public class CustomOauth2SuccessHandler implements AuthenticationSuccessHandler {
+
     private final JwtUtil jwtUtil;
+
     private final JwtService jwtService;
 
     @Override

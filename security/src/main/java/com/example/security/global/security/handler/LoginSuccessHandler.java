@@ -14,7 +14,9 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
+
     private final JwtUtil jwtUtil;
+
     private final JwtService jwtService;
 
     @Override
@@ -35,7 +37,4 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"message\":\"로그인되었습니다.\"}");
     }
-
-
-
 }

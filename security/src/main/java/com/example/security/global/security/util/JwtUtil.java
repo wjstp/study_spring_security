@@ -1,6 +1,5 @@
 package com.example.security.global.security.util;
 
-import com.example.security.global.security.dao.RefreshTokenRepository;
 import com.example.security.global.security.dto.CustomUserDetailsDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -27,8 +26,6 @@ public class JwtUtil {
     private final long accessTokenExpiration;
     private final long refreshTokenExpiration;
     private final String AUTHORITIES_KEY = "authorities";
-
-    private RefreshTokenRepository refreshTokenRepository;
 
     public JwtUtil(
             @Value("${spring.jwt.secret}")
@@ -101,6 +98,4 @@ public class JwtUtil {
                         .collect(Collectors.toCollection(ArrayList::new));
         return authorities;
     }
-
-
 }

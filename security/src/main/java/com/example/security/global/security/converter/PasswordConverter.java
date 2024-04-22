@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Converter
 @RequiredArgsConstructor
 public class PasswordConverter implements AttributeConverter<String, String> {
+
     private final PasswordEncoder passwordEncoder;
 
     @Override

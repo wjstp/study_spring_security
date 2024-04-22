@@ -23,8 +23,11 @@ import java.util.Objects;
 public class JwtService {
 
     private final JwtUtil jwtUtil;
+
     private final RefreshTokenRepository refreshTokenRepository;
+
     private static final String ACCESS_HEADER_AUTHORIZATION = "Authorization";
+
     private static final String TOKEN_PREFIX = "Bearer ";
 
     public Authentication authenticateJwtToken(HttpServletRequest request) {
